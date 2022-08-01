@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 fn main() {
-    let k = 5;
+    let k = 7;
     let vertices = 8;
     let edges = vec![
         (1, 2),
@@ -40,15 +40,27 @@ fn main() {
         }
     }
 
-    for (i, a) in ans.into_iter().enumerate() {
+    for (i, a) in ans.clone().into_iter().enumerate() {
         println!(
             "{i}: {}",
             a.iter()
+                .map(|e| e + 1)
                 .map(|e| e.to_string())
                 .collect::<Vec<_>>()
                 .join(", ")
         )
     }
+
+    let ans = ans
+        .into_iter()
+        .map(|mut v| {
+            v.sort();
+            v
+        })
+        .collect::<HashSet<_>>();
+
+    let rev_ans = reverse_search(vertices, &edges, k);
+    assert_eq!(rev_ans, ans)
 }
 
 fn connected(sub: &[usize], vertices: usize, edges: &HashSet<(usize, usize)>) -> bool {
@@ -75,4 +87,18 @@ fn in_connected(
             in_connected(sub, vertices, edges, j, visited)
         }
     }
+}
+
+fn reverse_search(
+    _vertices: usize,
+    _edges: &HashSet<(usize, usize)>,
+    _k: usize,
+) -> HashSet<Vec<usize>> {
+    let _first_ans = {
+        // let mut s = Vec::with_capacity(k);
+        // for i in 0..vertices {
+        //     //
+        // }
+    };
+    unimplemented!()
 }
