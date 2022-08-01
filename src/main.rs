@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-fn main() {
-    let k = 7;
+fn graph1() -> (usize, usize, HashSet<(usize, usize)>) {
+    let k = 6;
     let vertices = 8;
     let edges = vec![
         (1, 2),
@@ -20,7 +20,20 @@ fn main() {
     .into_iter()
     .map(|(a, b)| (a - 1, b - 1))
     .collect::<HashSet<_>>();
+    (k, vertices, edges)
+}
 
+fn graph2() -> (usize, usize, HashSet<(usize, usize)>) {
+    let k = 4;
+    let vertices = 5;
+    let edges = vec![(1, 2), (1, 5), (2, 3), (3, 5), (4, 5)]
+        .into_iter()
+        .map(|(a, b)| (a - 1, b - 1))
+        .collect();
+    (k, vertices, edges)
+}
+
+fn enumerate_all(k: usize, vertices: usize, edges: HashSet<(usize, usize)>) -> Vec<Vec<usize>> {
     let mut ans = Vec::new();
     for t in 0..1 << vertices {
         let sub = {
@@ -50,17 +63,27 @@ fn main() {
                 .join(", ")
         )
     }
+    ans
+}
 
-    let ans = ans
+fn main() {
+    let (k, vertices, edges) = graph1();
+
+    let ans = enumerate_all(k, vertices, edges);
+
+    let _ans = ans
         .into_iter()
         .map(|mut v| {
             v.sort();
             v
         })
         .collect::<HashSet<_>>();
+    println!();
 
-    let rev_ans = reverse_search(vertices, &edges, k);
-    assert_eq!(rev_ans, ans)
+    let (k, vertices, edges) = graph2();
+    let _ans = enumerate_all(k, vertices, edges);
+    // let rev_ans = reverse_search(vertices, &edges, k);
+    // assert_eq!(rev_ans, ans)
 }
 
 fn connected(sub: &[usize], vertices: usize, edges: &HashSet<(usize, usize)>) -> bool {
@@ -82,14 +105,14 @@ fn in_connected(
         if visited[j] {
             continue;
         }
-        if edges.contains(&(start, j)) || edges.contains(&(j, start)) {
+        if edges.contains(&(start, sub[j])) || edges.contains(&(sub[j], start)) {
             visited[j] = true;
-            in_connected(sub, vertices, edges, j, visited)
+            in_connected(sub, vertices, edges, sub[j], visited)
         }
     }
 }
 
-fn reverse_search(
+fn _reverse_search(
     _vertices: usize,
     _edges: &HashSet<(usize, usize)>,
     _k: usize,
