@@ -1,4 +1,80 @@
+use rand::Rng;
 use std::collections::HashSet;
+
+fn main() {
+    let (k, vertices, edges) = graph1();
+
+    let ans = enumerate_all(k, vertices, edges.clone());
+
+    let _ans = ans
+        .into_iter()
+        .map(|mut v| {
+            v.sort();
+            v
+        })
+        .collect::<HashSet<_>>();
+    let _ans_pro = proximity_search(vertices, &edges, k);
+
+    let (k, vertices, edges) = graph2();
+    let _ans = enumerate_all(k, vertices, edges.clone());
+    let _ans_pro = proximity_search(vertices, &edges, k);
+    // assert_eq!(ans_pro, ans);
+
+    let (k, vertices, edges) = graph3();
+    let mut ans = enumerate_all(k, vertices, edges.clone())
+        .into_iter()
+        .enumerate()
+        .map(|(i, v)| (v, i))
+        .collect::<Vec<_>>();
+    ans.sort();
+    for (a, i) in ans {
+        println!(
+            "{i}: {}",
+            a.iter()
+                .map(|e| e + 1)
+                .map(|e| e.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+    println!();
+    let _ans_pro = proximity_search(vertices, &edges, k);
+
+    let test_count = 400000;
+    let mut rng = rand::thread_rng();
+    for t in 0..test_count {
+        println!("{t}");
+        let vertices = (rng.gen::<usize>() % 16) + 1;
+        let mut edges = HashSet::new();
+        let edge_size = (rng.gen::<usize>() % vertices) * (rng.gen::<usize>() % vertices);
+        for _ in 0..edge_size {
+            let u = rng.gen::<usize>() % vertices;
+            let v = {
+                let mut v;
+                while {
+                    v = rng.gen::<usize>() % vertices;
+                    u == v
+                } {}
+                v
+            };
+            edges.insert((u, v));
+        }
+        let k = rng.gen::<usize>() % vertices;
+        if k == 0 {
+            continue;
+        }
+        if !connected(&(0..vertices).collect::<Vec<_>>(), vertices, &edges) {
+            continue;
+        }
+        let mut ans = enumerate_all(k, vertices, edges.clone());
+        ans.sort();
+        let ans_pro = proximity_search(vertices, &edges, k);
+        let mut ans_pro = ans_pro.into_iter().collect::<Vec<_>>();
+        ans_pro.sort();
+        println!("{vertices}, {edges:?}, {k}");
+        assert_eq!(ans, ans_pro);
+    }
+}
 
 fn graph1() -> (usize, usize, HashSet<(usize, usize)>) {
     let k = 6;
@@ -63,58 +139,18 @@ fn enumerate_all(k: usize, vertices: usize, edges: HashSet<(usize, usize)>) -> V
         }
     }
 
-    for (i, a) in ans.clone().into_iter().enumerate() {
-        println!(
-            "{i}: {}",
-            a.iter()
-                .map(|e| e + 1)
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
-    }
-    println!();
+    // for (i, a) in ans.clone().into_iter().enumerate() {
+    //     println!(
+    //         "{i}: {}",
+    //         a.iter()
+    //             .map(|e| e + 1)
+    //             .map(|e| e.to_string())
+    //             .collect::<Vec<_>>()
+    //             .join(", ")
+    //     )
+    // }
+    // println!();
     ans
-}
-
-fn main() {
-    let (k, vertices, edges) = graph1();
-
-    let ans = enumerate_all(k, vertices, edges.clone());
-
-    let _ans = ans
-        .into_iter()
-        .map(|mut v| {
-            v.sort();
-            v
-        })
-        .collect::<HashSet<_>>();
-    let _ans_pro = proximity_search(vertices, &edges, k);
-
-    let (k, vertices, edges) = graph2();
-    let _ans = enumerate_all(k, vertices, edges.clone());
-    let _ans_pro = proximity_search(vertices, &edges, k);
-    // assert_eq!(ans_pro, ans);
-
-    let (k, vertices, edges) = graph3();
-    let mut ans = enumerate_all(k, vertices, edges.clone())
-        .into_iter()
-        .enumerate()
-        .map(|(i, v)| (v, i))
-        .collect::<Vec<_>>();
-    ans.sort();
-    for (a, i) in ans {
-        println!(
-            "{i}: {}",
-            a.iter()
-                .map(|e| e + 1)
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
-    }
-    println!();
-    let _ans_pro = proximity_search(vertices, &edges, k);
 }
 
 fn connected(sub: &[usize], vertices: usize, edges: &HashSet<(usize, usize)>) -> bool {
@@ -184,17 +220,17 @@ fn proximity_search(
     first_ans.sort();
     ans.insert(first_ans.clone());
     rec(vertices, edges, k, &mut ans, first_ans);
-    for (i, a) in ans.clone().into_iter().enumerate() {
-        println!(
-            "{i}: {}",
-            a.iter()
-                .map(|e| e + 1)
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
-    }
-    println!();
+    // for (i, a) in ans.clone().into_iter().enumerate() {
+    //     println!(
+    //         "{i}: {}",
+    //         a.iter()
+    //             .map(|e| e + 1)
+    //             .map(|e| e.to_string())
+    //             .collect::<Vec<_>>()
+    //             .join(", ")
+    //     )
+    // }
+    // println!();
     ans
 }
 
