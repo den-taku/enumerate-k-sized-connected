@@ -40,7 +40,7 @@ fn main() {
     println!();
     let _ans_pro = proximity_search(vertices, &edges, k);
 
-    let test_count = 400000;
+    let test_count = 4000000;
     let mut rng = rand::thread_rng();
     for t in 0..test_count {
         println!("{t}");
